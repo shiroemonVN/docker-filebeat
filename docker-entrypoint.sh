@@ -13,20 +13,11 @@ if [ "$1" = 'start' ]; then
   }
 
   getRunningContainers() {
-    curl --no-buffer -s -XGET --unix-socket /tmp/docker.sock http:/containers/json | python -c "
-import json, sys
-containers=json.loads(sys.stdin.readline())
-for container in containers:
-  print(container['Id'])
-"
+    curl --no-buffer -s -XGET --unix-socket /tmp/docker.sock http:/containers/json | jq -r '.[] | .Id'
   }
 
   getContainerName() {
-    curl --no-buffer -s -XGET --unix-socket /tmp/docker.sock http:/containers/$1/json | python -c "
-import json, sys
-container=json.loads(sys.stdin.readline())
-print(container['Name'])
-" | sed 's;/;;'
+    curl --no-buffer -s -XGET --unix-socket /tmp/docker.sock http:/containers/$NAME/json | jq -r .Name  
   }
 
   createContainerFile() {
@@ -73,7 +64,7 @@ print(container['Name'])
   mkfifo -m a=rw "$NAMED_PIPE"
 
   echo "Initializing Filebeat..."
-  cat $NAMED_PIPE | ${FILEBEAT_HOME}/filebeat -e -v &
+  cat $NAMED_PIPE | ${FILEBEAT_HOME}/filebeat -c ${FILEBEAT_HOME}/filebeat.yml -e -v &
 
   while true; do
     CONTAINERS=`getRunningContainers`

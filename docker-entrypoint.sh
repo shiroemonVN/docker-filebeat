@@ -13,11 +13,11 @@ if [ "$1" = 'start' ]; then
   }
 
   getRunningContainers() {
-    curl --no-buffer -s -XGET --unix-socket /tmp/docker.sock http:/containers/json | jq -r '.[] | .Id'
+    curl --no-buffer -s -XGET --unix-socket /tmp/docker.sock http:/containers/json | jq -r '.[] | select(.Labels["filebeat.logging"] == "True") | .Id'
   }
 
   getContainerName() {
-    curl --no-buffer -s -XGET --unix-socket /tmp/docker.sock http:/containers/$NAME/json | jq -r .Name  
+    curl --no-buffer -s -XGET --unix-socket /tmp/docker.sock http:/containers/$1/json | jq -r .Name  
   }
 
   createContainerFile() {

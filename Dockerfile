@@ -15,7 +15,7 @@ ENV     PATH $PATH:${FILEBEAT_HOME}
 
 WORKDIR /opt/
 
-RUN apk --update add curl tar jq
+RUN apk --update add curl tar jq coreutils
 
 RUN     curl -sL ${FILEBEAT_URL} | tar xz -C .
 ADD     filebeat.yml ${FILEBEAT_HOME}/
